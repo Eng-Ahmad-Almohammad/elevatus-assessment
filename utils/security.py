@@ -113,6 +113,22 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
+    """Get current user based on the JWT token.
+
+    This function is responsible to get the User instance using
+    the email that is encoded in the JWT token.
+
+    Args:
+        token (Annotated[str, Depends): FastApi oauth2_scheme will provide the function with
+        the token that is attached in the Authorization header.
+
+    Raises:
+        HTTPException: If the there is no email in the token or
+        if the token is invalid or there is no user with the provided email
+
+    Returns:
+        User: User instance
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

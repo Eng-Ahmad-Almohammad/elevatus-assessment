@@ -1,7 +1,8 @@
 """A module that contains User's data pydantic schemas."""
+import re
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class BaseUser(BaseModel):
@@ -15,7 +16,32 @@ class BaseUser(BaseModel):
 class UserIn(BaseUser):
     """A class that represent the user's input data that is required to create a User instance."""
 
-    password: str
+    password: str = Field(..., min_length=8, max_length=50)
+
+    @field_validator("password")
+    def validate_password(cls, v: str) -> str:
+        """Validate the password.
+
+        Args:
+            v (str): password
+
+        Raises:
+            ValueError: Where it does not meet the requirements.
+
+        Returns:
+            str: valid password
+        """
+        if not re.search(r"[A-Z]", v):
+            raise ValueError("Password must contain at least one uppercase letter")
+        if not re.search(r"[a-z]", v):
+            raise ValueError("Password must contain at least one lowercase letter")
+        if not re.search(r"\d", v):
+            raise ValueError("Password must contain at least one digit")
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+            raise ValueError("Password must contain at least one special character")
+        if re.search(r"\s", v):
+            raise ValueError("Password must not contain any whitespace characters")
+        return v
 
 
 class UserOut(BaseUser):

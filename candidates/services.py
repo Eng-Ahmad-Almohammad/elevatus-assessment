@@ -72,7 +72,7 @@ class CandidateServices:
         """
         if candidate_update.email:
             created_candidate = await self.repo.get_by_email(candidate_update.email)
-            if created_candidate and created_candidate.uuid != str(candidate_uuid):
+            if created_candidate and str(created_candidate.uuid) != str(candidate_uuid):
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Email already used.",
@@ -90,19 +90,19 @@ class CandidateServices:
 
     async def get_all_candidates(
         self,
-        first_name: str | None,
-        last_name: str | None,
-        email: str | None,
-        career_level: CareerLevel | None,
-        job_major: JobMajor | None,
-        years_of_experience: int | None,
-        degree_type: DegreeType | None,
-        skills: str | None,
-        nationality: Countries | None,
-        city: str | None,
-        salary: float | None,
-        gender: Gender | None,
-        keyword: str | None,
+        first_name: str | None = None,
+        last_name: str | None = None,
+        email: str | None = None,
+        career_level: CareerLevel | None = None,
+        job_major: JobMajor | None = None,
+        years_of_experience: int | None = None,
+        degree_type: DegreeType | None = None,
+        skills: str | None = None,
+        nationality: Countries | None = None,
+        city: str | None = None,
+        salary: float | None = None,
+        gender: Gender | None = None,
+        keyword: str | None = None,
     ) -> list[Candidate] | None:
         """Get all candidates or filter them based on search criteria.
 
