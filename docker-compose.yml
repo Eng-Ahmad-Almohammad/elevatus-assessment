@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: fastapi_app
+    command: ["/code/entrypoint.sh"]
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  db:
+    image: mongo:latest
+    container_name: mongodb
+    env_file:
+      - .env
+    ports:
+      - "27017:27017"
+    environment:
+      - "MONGO_INITDB_DATABASE=${MONGODB_DATABASE}"
+      - "MONGO_INITDB_ROOT_USERNAME=${MONGODB_USER}"
+      - "MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo_data:

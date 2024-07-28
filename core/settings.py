@@ -9,4 +9,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "add_your_secrete_key_for_hashing"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
+    MONGODB_HOST: str
+    MONGODB_PORT: int
+    MONGODB_USER: str
+    MONGODB_PASSWORD: str
+    MONGODB_DATABASE: str
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
