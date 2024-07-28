@@ -2,7 +2,7 @@
 
 from uuid import UUID, uuid4
 
-from beanie import Document
+from beanie import Document, Indexed
 from pydantic import EmailStr, Field
 
 
@@ -12,7 +12,7 @@ class User(Document):
     uuid: UUID = Field(default_factory=uuid4)
     first_name: str
     last_name: str
-    email: EmailStr
+    email: EmailStr = Indexed(unique=True)
     hashed_password: str
 
     class Settings:

@@ -7,16 +7,7 @@ from fastapi import APIRouter, Depends, Query, status
 from fastapi.responses import StreamingResponse
 from pydantic import EmailStr
 
-from candidates.schemas import (
-    CandidateIn,
-    CandidateOut,
-    CareerLevel,
-    Countries,
-    DegreeType,
-    Gender,
-    JobMajor,
-    UpdateCandidate,
-)
+from candidates.schemas import CandidateIn, CandidateOut, CareerLevel, Countries, DegreeType, Gender, JobMajor
 from candidates.services import CandidateServices
 from DIContainer import DIContainer
 from users.models import User
@@ -71,7 +62,7 @@ async def create_candidate(
 @inject
 async def update_candidate(
     candidate_id: UUID,
-    update_candidate: UpdateCandidate,
+    update_candidate: CandidateIn,
     current_user: User = Depends(get_current_user),
     candidate_services: CandidateServices = Depends(
         Provide[DIContainer.candidate_services],

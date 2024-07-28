@@ -28,6 +28,17 @@ class AbstractRepo:
         """
         return await self.model.find_one(self.model.uuid == uuid)
 
+    async def get_by_email(self, email: str) -> Document | None:
+        """Find an element by email.
+
+        Args:
+            email (str)
+
+        Returns:
+            Document | None: None if the object is not found else an instance of Document.
+        """
+        return await self.model.find_one(self.model.email == email)
+
     async def create(self, model: Document) -> Document:
         """Create the Document in the db.
 

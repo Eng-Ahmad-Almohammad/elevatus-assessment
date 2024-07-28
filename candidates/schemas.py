@@ -1,6 +1,5 @@
 """A module that contains Candidate's data pydantic schemas."""
 from enum import Enum
-from typing import Optional
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, EmailStr, Field
@@ -107,20 +106,3 @@ class CandidateOut(Candidate):
         json_encoders = {
             UUID: str,
         }
-
-
-class UpdateCandidate(BaseModel):
-    """A class that represent the candidate's input data to Candidate instance."""
-
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    email: Optional[EmailStr] = None
-    career_level: Optional[CareerLevel] = None
-    job_major: Optional[JobMajor] = None
-    years_of_experience: Optional[int] = None
-    degree_type: Optional[DegreeType] = None
-    skills: Optional[list[str]] = None
-    nationality: Optional[Countries] = None
-    city: Optional[str] = None
-    salary: Optional[float] = None
-    gender: Optional[Gender] = None

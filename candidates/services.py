@@ -3,11 +3,11 @@ import csv
 import io
 from uuid import UUID
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from candidates.models import Candidate
 from candidates.repos import CandidateRepo
-from candidates.schemas import CandidateIn, CareerLevel, Countries, DegreeType, Gender, JobMajor, UpdateCandidate
+from candidates.schemas import CandidateIn, CareerLevel, Countries, DegreeType, Gender, JobMajor
 
 
 class CandidateServices:
@@ -47,23 +47,36 @@ class CandidateServices:
         Returns:
             Candidate: An instance of Candidate.
         """
+        created_candidate = await self.repo.get_by_email(candidate.email)
+        if created_candidate:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already used.",
+            )
         candidate = Candidate(**candidate.model_dump())
         return await self.repo.create(candidate)
 
     async def update_candidate_by_uuid(
         self,
         candidate_uuid: UUID,
-        candidate_update: UpdateCandidate,
+        candidate_update: CandidateIn,
     ) -> Candidate:
         """Update candidate in the db.
 
         Args:
             candidate_uuid (UUID): Candidate uuid.
-            candidate_update (UpdateCandidate): The required data to update candidate.
+            candidate_update (CandidateIn): The required data to update candidate.
 
         Returns:
             Candidate: Updated record.
         """
+        if candidate_update.email:
+            created_candidate = await self.repo.get_by_email(candidate_update.email)
+            if created_candidate and created_candidate.uuid != str(candidate_uuid):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already used.",
+                )
         updated_data: dict = candidate_update.model_dump(exclude_unset=True)
         return await self.repo.update(candidate_uuid, updated_data)
 
