@@ -168,5 +168,5 @@ async def generate_candidates_report(
     return StreamingResponse(
         csv_file,
         media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=users.csv"},
+        headers={"Content-Disposition": "attachment; filename=candidates.csv"},
     )
