@@ -1,3 +1,4 @@
+"""A module that contains Candidate's data pydantic schemas."""
 from enum import Enum
 from typing import Optional
 from uuid import UUID, uuid4
@@ -6,12 +7,22 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class CareerLevel(str, Enum):
+    """Enum for career level.
+
+    It inherits str so pydantic recognize the value as string.
+    """
+
     junior = "Junior"
     senior = "Senior"
     mid_level = "Mid Level"
 
 
 class JobMajor(str, Enum):
+    """Enum for job major.
+
+    It inherits str so pydantic recognize the value as string.
+    """
+
     computer_science = "Computer Science"
     computer_information_systems = "Computer Information Systems"
     software_engineer = "Software Engineering"
@@ -21,6 +32,11 @@ class JobMajor(str, Enum):
 
 
 class DegreeType(str, Enum):
+    """Enum for degree type.
+
+    It inherits str so pydantic recognize the value as string.
+    """
+
     high_school = "High School"
     bachelor = "Bachelor"
     master = "Master"
@@ -28,6 +44,11 @@ class DegreeType(str, Enum):
 
 
 class Countries(str, Enum):
+    """Enum for countries.
+
+    It inherits str so pydantic recognize the value as string.
+    """
+
     # We went with Enum for countries because those values are not changing frequently,
     # so it is easier for validation to use it as Enum
     us = "United States"
@@ -41,12 +62,19 @@ class Countries(str, Enum):
 
 
 class Gender(str, Enum):
+    """Enum for gender.
+
+    It inherits str so pydantic recognize the value as string.
+    """
+
     m = "Male"
     f = "Female"
     ns = "Not Specified"
 
 
 class Candidate(BaseModel):
+    """Base class for candidate info."""
+
     first_name: str = Field(..., min_length=2, max_length=50)
     last_name: str = Field(..., min_length=2, max_length=50)
     email: EmailStr
@@ -62,13 +90,19 @@ class Candidate(BaseModel):
 
 
 class CandidateIn(Candidate):
+    """A class that represent the candidate's input data that is required to create a Candidate instance."""
+
     pass
 
 
 class CandidateOut(Candidate):
+    """A class that represent the output to return for the created candidate."""
+
     uuid: UUID = uuid4()
 
     class Config:
+        """Configuration class."""
+
         from_attributes = True
         json_encoders = {
             UUID: str,
@@ -76,6 +110,8 @@ class CandidateOut(Candidate):
 
 
 class UpdateCandidate(BaseModel):
+    """A class that represent the candidate's input data to Candidate instance."""
+
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     email: Optional[EmailStr] = None

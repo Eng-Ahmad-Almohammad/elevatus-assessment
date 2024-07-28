@@ -1,3 +1,4 @@
+"""This module has the service for interacting with Candidate model."""
 import csv
 import io
 from uuid import UUID
@@ -6,38 +7,72 @@ from fastapi import HTTPException
 
 from candidates.models import Candidate
 from candidates.repos import CandidateRepo
-from candidates.schemas import (
-    CandidateIn,
-    CareerLevel,
-    Countries,
-    DegreeType,
-    Gender,
-    JobMajor,
-    UpdateCandidate,
-)
+from candidates.schemas import CandidateIn, CareerLevel, Countries, DegreeType, Gender, JobMajor, UpdateCandidate
 
 
 class CandidateServices:
+    """Service that interact with Candidate model."""
+
     def __init__(self, candidate_repo: CandidateRepo) -> None:
+        """Class constructor.
+
+        Args:
+            candidate_repo (CandidateRepo): instance of CandidateRepo
+        """
         self.repo = candidate_repo
 
     async def get_candidate_by_uuid(self, candidate_uuid: UUID) -> Candidate:
-        candidate = await self.repo.get_by_uuid(candidate_uuid)
+        """Get the candidate by uuid.
+
+        Args:
+            candidate_uuid (UUID): Candidate uuid.
+
+        Raises:
+            HTTPException: If the user not found.
+
+        Returns:
+            Candidate: An instance of Candidate model.
+        """
+        candidate: Candidate | None = await self.repo.get_by_uuid(candidate_uuid)
         if candidate:
             return candidate
         raise HTTPException(status_code=404, detail="Candidate not found")
 
     async def create(self, candidate: CandidateIn) -> Candidate:
+        """Create candidate in the db.
+
+        Args:
+            candidate (CandidateIn): The required data to create candidate.
+
+        Returns:
+            Candidate: An instance of Candidate.
+        """
         candidate = Candidate(**candidate.model_dump())
         return await self.repo.create(candidate)
 
     async def update_candidate_by_uuid(
-        self, candidate_uuid: UUID, candidate_update: UpdateCandidate
-    ):
+        self,
+        candidate_uuid: UUID,
+        candidate_update: UpdateCandidate,
+    ) -> Candidate:
+        """Update candidate in the db.
+
+        Args:
+            candidate_uuid (UUID): Candidate uuid.
+            candidate_update (UpdateCandidate): The required data to update candidate.
+
+        Returns:
+            Candidate: Updated record.
+        """
         updated_data: dict = candidate_update.model_dump(exclude_unset=True)
         return await self.repo.update(candidate_uuid, updated_data)
 
-    async def delete_candidate_by_uuid(self, candidate_uuid: UUID):
+    async def delete_candidate_by_uuid(self, candidate_uuid: UUID) -> None:
+        """Delete candidate.
+
+        Args:
+            candidate_uuid (UUID): Candidate uuid.
+        """
         return await self.repo.delete(candidate_uuid)
 
     async def get_all_candidates(
@@ -55,7 +90,31 @@ class CandidateServices:
         salary: float | None,
         gender: Gender | None,
         keyword: str | None,
-    ):
+    ) -> list[Candidate] | None:
+        """Get all candidates or filter them based on search criteria.
+
+        This method is filtering candidates using 'and' between search terms.
+
+        Args:
+            first_name (str | None): Candidate first name to search for.
+            last_name (str | None): Candidate last name to search for.
+            email (str | None): Candidate email to search for.
+            career_level (CareerLevel | None): Candidate career level to search for.
+            job_major (JobMajor | None): Candidate job major to search for.
+            years_of_experience (int | None): Candidate years of experience to search for.
+            degree_type (DegreeType | None): Candidate degree type to search for.
+            skills (str | None): Candidate skill to search for.
+            nationality (Countries | None): Candidate nationality to search for.
+            city (str | None): Candidate city to search for.
+            salary (float | None): Candidate salary to search for.
+            gender (Gender | None): Candidate gender to search for.
+            keyword (str | None): Any info about candidate to search for
+            the candidate using all candidate's fields.
+
+        Returns:
+            list[Candidate] | None: If no candidate found using the search criteria
+            then return None else return list of Candidates.
+        """
         filters = {}
         if first_name:
             filters["first_name"] = first_name
@@ -99,7 +158,12 @@ class CandidateServices:
 
         return await self.repo.get_all(filters)
 
-    async def generate_csv_file_with_all_candidates(self):
+    async def generate_csv_file_with_all_candidates(self) -> io.StringIO:
+        """Generate CSV StringIO with all candidates data.
+
+        Returns:
+            io.StringIO: In memeory csv file.
+        """
         all_candidates: list[Candidate] = await self.get_all_candidates()
         output = io.StringIO()
         writer = csv.writer(output)
@@ -119,7 +183,7 @@ class CandidateServices:
                 "City",
                 "Salary",
                 "Gender",
-            ]
+            ],
         )
 
         for candidate in all_candidates:
@@ -140,7 +204,7 @@ class CandidateServices:
                     candidate.city,
                     candidate.salary,
                     candidate.gender,
-                ]
+                ],
             )
 
         output.seek(0)

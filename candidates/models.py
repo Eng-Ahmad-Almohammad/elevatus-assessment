@@ -1,3 +1,4 @@
+"""A module that has the DB model for Candidate."""
 from uuid import UUID, uuid4
 
 from beanie import Document
@@ -5,6 +6,8 @@ from pydantic import EmailStr, Field
 
 
 class Candidate(Document):
+    """DB model to interact with Candidate collections."""
+
     uuid: UUID = Field(default_factory=uuid4)
     first_name: str
     last_name: str
@@ -20,9 +23,13 @@ class Candidate(Document):
     gender: str
 
     class Settings:
+        """Setting class."""
+
         collection = "candidates"
 
     class Config:
+        """Configuration class."""
+
         json_encoders = {
             UUID: str,
         }

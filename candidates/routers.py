@@ -1,3 +1,4 @@
+"""A module that has the routes to interact with Candidate model."""
 from typing import Annotated
 from uuid import UUID
 
@@ -29,35 +30,43 @@ generate_report_router = APIRouter(prefix="/generate-report", tags=["generate_re
 
 
 @candidate_router.get(
-    "/{candidate_id}", response_model=CandidateOut, status_code=status.HTTP_200_OK
+    "/{candidate_id}",
+    response_model=CandidateOut,
+    status_code=status.HTTP_200_OK,
 )
 @inject
 async def get_candidate(
     candidate_id: UUID,
     current_user: User = Depends(get_current_user),
     candidate_services: CandidateServices = Depends(
-        Provide[DIContainer.candidate_services]
+        Provide[DIContainer.candidate_services],
     ),
 ):
+    """### Get candidate instance by uuid."""
     return await candidate_services.get_candidate_by_uuid(candidate_id)
 
 
 @candidate_router.post(
-    "/", response_model=CandidateOut, status_code=status.HTTP_201_CREATED
+    "/",
+    response_model=CandidateOut,
+    status_code=status.HTTP_201_CREATED,
 )
 @inject
 async def create_candidate(
     candidate: CandidateIn,
     current_user: User = Depends(get_current_user),
     candidate_services: CandidateServices = Depends(
-        Provide[DIContainer.candidate_services]
+        Provide[DIContainer.candidate_services],
     ),
 ):
+    """### Create candidate instance in the database."""
     return await candidate_services.create(candidate)
 
 
 @candidate_router.put(
-    "/{candidate_id}", response_model=CandidateOut, status_code=status.HTTP_201_CREATED
+    "/{candidate_id}",
+    response_model=CandidateOut,
+    status_code=status.HTTP_201_CREATED,
 )
 @inject
 async def update_candidate(
@@ -65,30 +74,37 @@ async def update_candidate(
     update_candidate: UpdateCandidate,
     current_user: User = Depends(get_current_user),
     candidate_services: CandidateServices = Depends(
-        Provide[DIContainer.candidate_services]
+        Provide[DIContainer.candidate_services],
     ),
 ):
+    """### Update candidate instance by uuid."""
     return await candidate_services.update_candidate_by_uuid(
-        candidate_id, update_candidate
+        candidate_id,
+        update_candidate,
     )
 
 
 @candidate_router.delete(
-    "/{candidate_id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT
+    "/{candidate_id}",
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 @inject
 async def delete_candidate(
     candidate_id: UUID,
     current_user: User = Depends(get_current_user),
     candidate_services: CandidateServices = Depends(
-        Provide[DIContainer.candidate_services]
+        Provide[DIContainer.candidate_services],
     ),
 ):
+    """### Delete candidate instance by uuid."""
     return await candidate_services.delete_candidate_by_uuid(candidate_id)
 
 
 @all_candidate_router.get(
-    "/", response_model=list[CandidateOut], status_code=status.HTTP_200_OK
+    "/",
+    response_model=list[CandidateOut],
+    status_code=status.HTTP_200_OK,
 )
 @inject
 async def get_all_candidates(
@@ -107,9 +123,13 @@ async def get_all_candidates(
     keyword: str | None = None,
     current_user: User = Depends(get_current_user),
     candidate_services: CandidateServices = Depends(
-        Provide[DIContainer.candidate_services]
+        Provide[DIContainer.candidate_services],
     ),
 ):
+    """### Get all candidates.
+
+    #### Search criteria is using and condition between search terms.
+    """
     return await candidate_services.get_all_candidates(
         first_name,
         last_name,
@@ -134,15 +154,16 @@ async def get_all_candidates(
         200: {
             "description": "CSV file with all candidates",
             "content": {"text/csv": {"schema": {"type": "string", "format": "binary"}}},
-        }
+        },
     },
 )
 @inject
 async def generate_candidates_report(
     candidate_services: CandidateServices = Depends(
-        Provide[DIContainer.candidate_services]
+        Provide[DIContainer.candidate_services],
     ),
 ):
+    """### Generate A CSV file with all candidate data."""
     csv_file = await candidate_services.generate_csv_file_with_all_candidates()
     return StreamingResponse(
         csv_file,
